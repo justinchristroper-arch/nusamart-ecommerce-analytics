@@ -1,0 +1,14 @@
+# Data mentah & hasil proses tidak di-upload (bisa direproduksi dari notebook)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Kredensial
+.env
+
+# Python / Jupyter
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+venv/

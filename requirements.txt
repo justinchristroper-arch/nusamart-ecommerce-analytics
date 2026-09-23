@@ -1,0 +1,4 @@
+pandas>=2.2,<3.0
+notebook
+sqlalchemy>=2.0
+psycopg2-binary
