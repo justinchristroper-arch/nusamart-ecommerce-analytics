@@ -55,10 +55,13 @@ ORDER BY month;
 -- ---------------------------------------------------------------------
 -- Q1b: Year-over-Year per bulan (bulan yang sama tahun sebelumnya)
 -- Hanya terisi untuk bulan yang bulan-pasangannya di tahun sebelumnya
--- JUGA termasuk is_analysis_month. Karena itu, 2017-09 s/d 2017-12 akan
--- punya revenue_last_year kosong (NULL): bulan pasangannya di 2016 memang
--- sengaja dikecualikan (data tidak lengkap), jadi tidak dipakai sebagai
--- pembanding YoY -- ini konsisten dengan keputusan, bukan bug.
+-- JUGA termasuk is_analysis_month. Karena seluruh 2016 berada di luar
+-- jendela analisis, SEMUA bulan 2017 (2017-01 s/d 2017-12) punya
+-- revenue_last_year kosong (NULL); YoY hanya terisi untuk 2018-01 s/d
+-- 2018-07. Bulan pasangannya di 2016 memang sengaja dikecualikan (data
+-- tidak lengkap), jadi tidak dipakai sebagai pembanding YoY -- ini
+-- konsisten dengan keputusan, bukan bug. Measure YoY di Power BI
+-- (powerbi/dax_measures.md) mengikuti aturan yang sama.
 -- ---------------------------------------------------------------------
 WITH monthly AS (
     SELECT DATE_TRUNC('month', f.order_date)::date AS month, SUM(f.price) AS revenue
