@@ -2,15 +2,23 @@
 -- 03_customer_analysis.sql
 -- Business questions: retensi (Q4) & konsentrasi revenue customer (Q5)
 -- Definisi: customer = customer_unique_id; hanya order delivered.
+--
+-- SEMUA order/revenue di file ini difilter is_analysis_month = TRUE.
+-- PENGECUALIAN PENTING: dim_customer.first_order_date TIDAK PERNAH
+-- difilter -- kolom itu dihitung dari seluruh histori (termasuk 2016),
+-- supaya status new/returning tetap benar meski bulan pertama customer
+-- itu ada di luar jendela analisis.
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- Q4a: Repeat purchase rate (sepanjang periode data)
+-- Q4a: Repeat purchase rate (di dalam jendela analisis)
 -- ---------------------------------------------------------------------
 WITH per_customer AS (
-    SELECT customer_unique_id, COUNT(DISTINCT order_id) AS n_orders
-    FROM fact_sales
-    GROUP BY customer_unique_id
+    SELECT f.customer_unique_id, COUNT(DISTINCT f.order_id) AS n_orders
+    FROM fact_sales f
+    JOIN dim_date d ON f.order_date = d.date_key
+    WHERE d.is_analysis_month = TRUE
+    GROUP BY f.customer_unique_id
 )
 SELECT
     COUNT(*)                                                    AS total_customers,
@@ -20,12 +28,14 @@ SELECT
 FROM per_customer;
 
 -- ---------------------------------------------------------------------
--- Q4b: Distribusi jumlah order per customer
+-- Q4b: Distribusi jumlah order per customer (di dalam jendela analisis)
 -- ---------------------------------------------------------------------
 WITH per_customer AS (
-    SELECT customer_unique_id, COUNT(DISTINCT order_id) AS n_orders
-    FROM fact_sales
-    GROUP BY customer_unique_id
+    SELECT f.customer_unique_id, COUNT(DISTINCT f.order_id) AS n_orders
+    FROM fact_sales f
+    JOIN dim_date d ON f.order_date = d.date_key
+    WHERE d.is_analysis_month = TRUE
+    GROUP BY f.customer_unique_id
 )
 SELECT
     n_orders,
@@ -37,8 +47,12 @@ ORDER BY n_orders;
 
 -- ---------------------------------------------------------------------
 -- Q4c: New vs returning customer per bulan (jumlah & revenue)
--- New       = bulan ini adalah bulan order pertamanya
--- Returning = sudah pernah order di bulan sebelumnya
+-- New       = bulan ini adalah bulan order pertamanya (first_order_date
+--             TIDAK difilter, jadi tetap benar walau order pertamanya
+--             ada di 2016)
+-- Returning = sudah pernah order sebelum bulan ini
+-- Bulan yang dilaporkan (kolom "month") dibatasi ke jendela analisis;
+-- histori first_order_date di baliknya tetap penuh.
 -- ---------------------------------------------------------------------
 WITH customer_month AS (
     SELECT
@@ -48,6 +62,8 @@ WITH customer_month AS (
         SUM(f.price)                                   AS revenue
     FROM fact_sales f
     JOIN dim_customer c USING (customer_unique_id)
+    JOIN dim_date d ON f.order_date = d.date_key
+    WHERE d.is_analysis_month = TRUE
     GROUP BY 1, 2, 3
 )
 SELECT
@@ -63,13 +79,15 @@ GROUP BY month
 ORDER BY month;
 
 -- ---------------------------------------------------------------------
--- Q5a: Konsentrasi revenue per desil customer
+-- Q5a: Konsentrasi revenue per desil customer (di dalam jendela analisis)
 -- Desil 1 = 10% customer dengan revenue tertinggi
 -- ---------------------------------------------------------------------
 WITH customer_revenue AS (
-    SELECT customer_unique_id, SUM(price) AS revenue
-    FROM fact_sales
-    GROUP BY customer_unique_id
+    SELECT f.customer_unique_id, SUM(f.price) AS revenue
+    FROM fact_sales f
+    JOIN dim_date d ON f.order_date = d.date_key
+    WHERE d.is_analysis_month = TRUE
+    GROUP BY f.customer_unique_id
 ),
 ranked AS (
     SELECT revenue, NTILE(10) OVER (ORDER BY revenue DESC) AS decile
@@ -87,7 +105,7 @@ GROUP BY decile
 ORDER BY decile;
 
 -- ---------------------------------------------------------------------
--- Q5b: Top 10 customer berdasarkan revenue
+-- Q5b: Top 10 customer berdasarkan revenue (di dalam jendela analisis)
 -- (ID sudah dianonimkan oleh Olist; tampilkan versi pendek di dashboard)
 -- ---------------------------------------------------------------------
 SELECT
@@ -97,6 +115,8 @@ SELECT
     ROUND(SUM(f.price), 2)          AS revenue
 FROM fact_sales f
 JOIN dim_customer c USING (customer_unique_id)
+JOIN dim_date d ON f.order_date = d.date_key
+WHERE d.is_analysis_month = TRUE
 GROUP BY f.customer_unique_id, c.customer_state
 ORDER BY revenue DESC
 LIMIT 10;

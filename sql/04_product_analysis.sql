@@ -4,6 +4,8 @@
 -- dan proxy biaya: freight burden (Q7, pengganti profit).
 -- Freight burden = total ongkir / total revenue produk.
 -- INI PROXY, BUKAN PROFIT. Dataset tidak memiliki data cost produk.
+-- Semua query difilter is_analysis_month = TRUE agar identik dengan
+-- notebook & Power BI.
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
@@ -17,6 +19,8 @@ SELECT
     ROUND(AVG(f.price), 2)      AS avg_price
 FROM fact_sales f
 JOIN dim_product p USING (product_id)
+JOIN dim_date d ON f.order_date = d.date_key
+WHERE d.is_analysis_month = TRUE
 GROUP BY f.product_id, p.category_en
 ORDER BY revenue DESC
 LIMIT 10;
@@ -33,6 +37,8 @@ SELECT
     ROUND(AVG(f.price), 2)      AS avg_price
 FROM fact_sales f
 JOIN dim_product p USING (product_id)
+JOIN dim_date d ON f.order_date = d.date_key
+WHERE d.is_analysis_month = TRUE
 GROUP BY f.product_id, p.category_en
 ORDER BY units_sold DESC
 LIMIT 10;
@@ -44,11 +50,13 @@ LIMIT 10;
 WITH cat AS (
     SELECT
         p.category_en,
-        COUNT(*)            AS units_sold,
-        SUM(f.price)        AS revenue,
-        SUM(f.freight_value) AS freight
+        COUNT(*)              AS units_sold,
+        SUM(f.price)          AS revenue,
+        SUM(f.freight_value)  AS freight
     FROM fact_sales f
     JOIN dim_product p USING (product_id)
+    JOIN dim_date d ON f.order_date = d.date_key
+    WHERE d.is_analysis_month = TRUE
     GROUP BY p.category_en
 )
 SELECT
@@ -73,6 +81,8 @@ WITH cat AS (
         SUM(f.freight_value)  AS freight
     FROM fact_sales f
     JOIN dim_product p USING (product_id)
+    JOIN dim_date d ON f.order_date = d.date_key
+    WHERE d.is_analysis_month = TRUE
     GROUP BY p.category_en
 ),
 overall AS (
