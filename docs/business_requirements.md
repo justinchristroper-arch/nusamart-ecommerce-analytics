@@ -80,7 +80,7 @@ NusaMart adalah marketplace multi-kategori dengan pelanggan di banyak wilayah. D
 | Returning Customer | Customer yang order di periode tersebut dan sudah pernah order sebelumnya |
 | Repeat Rate | Customer dengan ≥ 2 order / Total Customers |
 | Revenue Concentration | % revenue dari 10% customer teratas |
-| Freight Burden (proxy) | Σ `freight_value` / Σ `price` — **proxy biaya, bukan profit** |
+| Freight Burden (proxy) | Σ `freight_value` / Σ `price`. `freight_value` adalah ongkir yang **dibayar customer** (bukan biaya perusahaan/seller) — jadi ini proxy **beban ongkir yang ditanggung customer relatif terhadap harga barang**, **bukan profit dan bukan biaya perusahaan** |
 
 ## 9. Business questions
 

@@ -22,7 +22,7 @@ Grain: 1 baris = 1 item (1 unit) dalam 1 order berstatus `delivered`.
 | order_date | DATE | Tanggal pembelian; FK → dim_date |
 | customer_state | CHAR(2) | State customer saat order dibuat |
 | price | NUMERIC | Harga item = revenue (tanpa ongkir) |
-| freight_value | NUMERIC | Ongkir item |
+| freight_value | NUMERIC | Ongkir item, **dibayar oleh customer** (bukan biaya perusahaan/seller). Dipakai sebagai proxy "freight burden" (Σ freight_value / Σ price) — beban ongkir yang ditanggung customer relatif terhadap harga barang, bukan profit dan bukan biaya perusahaan |
 
 ## dim_customer
 

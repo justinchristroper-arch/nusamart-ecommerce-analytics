@@ -78,6 +78,26 @@ LEFT JOIN monthly prev
 ORDER BY cur.month;
 
 -- ---------------------------------------------------------------------
+-- Q1c: Perbandingan periode sebanding -- Jan-Agu 2017 vs Jan-Agu 2018
+-- Q1b (YoY per bulan kalender) membandingkan bulan yang sama, tapi total
+-- setahun 2017 vs 2018 tidak adil dibandingkan langsung karena 2018 di
+-- jendela analisis cuma sampai Agustus. Query ini membatasi KEDUA tahun
+-- ke bulan Januari-Agustus saja supaya perbandingan growth setara.
+-- ---------------------------------------------------------------------
+SELECT
+    EXTRACT(YEAR FROM f.order_date)::int                    AS year,
+    ROUND(SUM(f.price), 2)                                  AS revenue,
+    COUNT(DISTINCT f.order_id)                              AS orders,
+    COUNT(DISTINCT f.customer_unique_id)                    AS customers,
+    ROUND(SUM(f.price) / COUNT(DISTINCT f.order_id), 2)     AS aov
+FROM fact_sales f
+JOIN dim_date d ON f.order_date = d.date_key
+WHERE d.is_analysis_month = TRUE
+  AND EXTRACT(MONTH FROM f.order_date) BETWEEN 1 AND 8
+GROUP BY 1
+ORDER BY 1;
+
+-- ---------------------------------------------------------------------
 -- Q2: Revenue per kategori + kontribusi (%)
 -- ---------------------------------------------------------------------
 SELECT

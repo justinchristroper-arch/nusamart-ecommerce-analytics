@@ -1,9 +1,11 @@
 -- =====================================================================
 -- 04_product_analysis.sql
 -- Business questions: produk teratas, kategori (Q2), volume vs nilai (Q6),
--- dan proxy biaya: freight burden (Q7, pengganti profit).
--- Freight burden = total ongkir / total revenue produk.
--- INI PROXY, BUKAN PROFIT. Dataset tidak memiliki data cost produk.
+-- dan proxy freight burden (Q7, pengganti profit).
+-- Freight burden = total ongkir (freight_value, DIBAYAR CUSTOMER) / total
+-- revenue produk. Artinya: beban ongkir yang ditanggung customer relatif
+-- terhadap harga barang -- BUKAN biaya perusahaan/seller, dan BUKAN profit.
+-- Dataset tidak memiliki data cost produk sama sekali.
 -- Semua query difilter is_analysis_month = TRUE agar identik dengan
 -- notebook & Power BI.
 -- =====================================================================

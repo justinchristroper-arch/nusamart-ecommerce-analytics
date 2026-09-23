@@ -49,7 +49,7 @@ CREATE TABLE fact_sales (
     order_date          DATE          NOT NULL REFERENCES dim_date (date_key),
     customer_state      CHAR(2),
     price               NUMERIC(10,2) NOT NULL,   -- revenue (tanpa ongkir)
-    freight_value       NUMERIC(10,2) NOT NULL,   -- ongkir
+    freight_value       NUMERIC(10,2) NOT NULL,   -- ongkir dibayar customer (bukan biaya perusahaan)
     PRIMARY KEY (order_id, order_item_id)
 );
 
