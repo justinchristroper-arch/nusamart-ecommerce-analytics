@@ -141,6 +141,65 @@ FROM cat_year
 ORDER BY year, rank_in_year;
 
 -- ---------------------------------------------------------------------
+-- Q2c: Pergeseran kategori dengan periode sebanding (Jan-Agu 2017 vs Jan-Agu 2018)
+-- Q2b membandingkan 2017 SETAHUN PENUH dengan 2018 yang hanya Jan-Agu.
+-- Padahal 2017 memuat November (Black Friday, bulan revenue tertinggi) dan
+-- Desember, sehingga kategori musiman bisa tampak "turun" di 2018 hanya
+-- karena bulan-bulan itu belum ada. Query ini membatasi KEDUA tahun ke
+-- Januari-Agustus (sama seperti Q1c) supaya pergeseran share adil.
+-- Kolom terakhir menunjukkan porsi revenue 2017 tiap kategori yang jatuh
+-- di Nov-Des, untuk melihat kategori mana yang musiman.
+-- ---------------------------------------------------------------------
+WITH base AS (
+    SELECT
+        EXTRACT(YEAR FROM f.order_date)::int   AS year,
+        EXTRACT(MONTH FROM f.order_date)::int  AS month,
+        p.category_en,
+        f.price
+    FROM fact_sales f
+    JOIN dim_product p USING (product_id)
+    JOIN dim_date d ON f.order_date = d.date_key
+    WHERE d.is_analysis_month = TRUE
+),
+jan_aug AS (
+    SELECT year, category_en, SUM(price) AS revenue
+    FROM base
+    WHERE month BETWEEN 1 AND 8
+    GROUP BY 1, 2
+),
+shares AS (
+    SELECT
+        year,
+        category_en,
+        revenue,
+        revenue / SUM(revenue) OVER (PARTITION BY year) * 100  AS share_pct,
+        RANK() OVER (PARTITION BY year ORDER BY revenue DESC)  AS rank_in_year
+    FROM jan_aug
+),
+musim_2017 AS (
+    SELECT
+        category_en,
+        SUM(price) FILTER (WHERE month IN (11, 12)) / SUM(price) * 100  AS pct_in_nov_dec
+    FROM base
+    WHERE year = 2017
+    GROUP BY category_en
+)
+SELECT
+    category_en,
+    ROUND(a.revenue, 2)                   AS revenue_2017_jan_aug,
+    ROUND(b.revenue, 2)                   AS revenue_2018_jan_aug,
+    ROUND(a.share_pct, 2)                 AS share_2017_pct,
+    ROUND(b.share_pct, 2)                 AS share_2018_pct,
+    ROUND(b.share_pct - a.share_pct, 2)   AS share_change_pp,
+    a.rank_in_year                        AS rank_2017,
+    b.rank_in_year                        AS rank_2018,
+    ROUND(m.pct_in_nov_dec, 2)            AS pct_2017_revenue_in_nov_dec
+FROM (SELECT * FROM shares WHERE year = 2017) a
+FULL OUTER JOIN (SELECT * FROM shares WHERE year = 2018) b USING (category_en)
+LEFT JOIN musim_2017 m USING (category_en)
+ORDER BY revenue_2018_jan_aug DESC NULLS LAST;
+
+-- ---------------------------------------------------------------------
 -- Q3: Performa per wilayah (state customer)
 -- ---------------------------------------------------------------------
 SELECT

@@ -8,7 +8,7 @@
 
 ## Business problem
 
-NusaMart (perusahaan fiktif) memiliki data transaksi dalam jumlah besar, tetapi manajemen belum dapat menjawab pertanyaan dasar secara konsisten: dari mana pertumbuhan berasal, kategori mana yang dominan, seberapa loyal customer, dan di mana beban biaya pengiriman paling tinggi.
+NusaMart (perusahaan fiktif) memiliki data transaksi dalam jumlah besar, tetapi manajemen belum dapat menjawab pertanyaan dasar secara konsisten: dari mana pertumbuhan berasal, kategori mana yang dominan, seberapa loyal customer, dan di mana beban ongkir yang ditanggung customer paling tinggi.
 
 Project ini membangun satu sumber angka yang konsisten dan menerjemahkannya menjadi rekomendasi. Detail lengkap: [Business Requirements Document](docs/business_requirements.md).
 
@@ -28,14 +28,20 @@ Raw CSV (Olist) → Python/Pandas → PostgreSQL (star schema) → SQL analysis 
 
 ## Key insights
 
-*Diisi setelah analisis selesai: 3–5 temuan terpenting, masing-masing satu kalimat + angka.*
+Jendela analisis 2017-01 s/d 2018-08. Bukti lengkap, hipotesis, dan rekomendasi: [`docs/insights_and_recommendations.md`](docs/insights_and_recommendations.md).
+
+- **Pertumbuhan hampir seluruhnya dari volume:** revenue Jan–Agu 2018 naik 141,1% dibanding Jan–Agu 2017, tetapi AOV hanya +0,5%, dan order bulanan 2018 justru turun dari 7.069 (Januari) ke 6.351 (Agustus).
+- **Retensi sangat rendah:** 97,0% customer hanya belanja sekali, dan customer yang kembali hanya menyumbang 1,79% revenue.
+- **Revenue terkonsentrasi pada pembelian besar sekali jalan:** 10% customer teratas menyumbang 41,10% revenue, tetapi 91,97% revenue kelompok ini berasal dari customer yang hanya belanja sekali.
+- **Ongkir yang dibayar customer membebani secara tidak merata:** sembilan kategori besar (36,24% revenue) punya freight burden di atas rata-rata 16,63%, dan di beberapa state utara/timur laut bebannya mencapai 24–28%, jauh di atas SP (13,85%).
+- **Mix kategori bergeser** (periode sebanding Jan–Agu): `watches_gifts` naik dari peringkat #6 ke #2, sementara porsi `cool_stuff` turun dari 6,89% ke 3,16%.
 
 ## Keputusan data yang penting
 
 - Revenue hanya dari order `delivered`, tanpa ongkir.
 - Customer diidentifikasi dengan `customer_unique_id` (bukan `customer_id`, yang berbeda di setiap order).
-- Dataset tidak memiliki cost, sehingga **profit tidak dianalisis**; sebagai gantinya dipakai proxy *freight burden* (ongkir / revenue).
-- Bulan awal/akhir yang datanya tidak lengkap dikecualikan dari analisis tren.
+- Dataset tidak memiliki cost, sehingga **profit tidak dianalisis**. Sebagai gantinya dipakai proxy *freight burden* = Σ ongkir ÷ Σ harga barang. Ongkir (`freight_value`) di dataset ini **dibayar oleh customer**, jadi freight burden mengukur **beban ongkir yang ditanggung customer** relatif terhadap harga barang — bukan profit, dan bukan biaya perusahaan.
+- Analisis memakai **jendela 2017-01 s/d 2018-08**. Bulan di kedua ujung dataset yang datanya tidak lengkap ditandai lewat kolom `dim_date.is_analysis_month` dan dikecualikan secara konsisten di SQL maupun dashboard. Perbandingan antartahun memakai periode sebanding Jan–Agu.
 
 ## Cara menjalankan ulang
 

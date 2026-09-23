@@ -120,3 +120,42 @@ WHERE d.is_analysis_month = TRUE
 GROUP BY f.customer_unique_id, c.customer_state
 ORDER BY revenue DESC
 LIMIT 10;
+
+-- ---------------------------------------------------------------------
+-- Q5c: Perilaku repeat per desil customer (di dalam jendela analisis)
+-- Pertanyaan: apakah 10% customer teratas di Q5a adalah pembeli setia yang
+-- belanja berulang, atau pembeli sekali dengan belanja besar?
+-- Desil dihitung sama seperti Q5a, ditambah tiebreaker customer_unique_id
+-- supaya pembagian desil selalu sama setiap kali dijalankan. Revenue per
+-- desil tetap identik dengan Q5a, karena customer yang bertukar posisi di
+-- batas desil punya revenue yang sama persis.
+-- ---------------------------------------------------------------------
+WITH customer_revenue AS (
+    SELECT
+        f.customer_unique_id,
+        SUM(f.price)                AS revenue,
+        COUNT(DISTINCT f.order_id)  AS n_orders
+    FROM fact_sales f
+    JOIN dim_date d ON f.order_date = d.date_key
+    WHERE d.is_analysis_month = TRUE
+    GROUP BY f.customer_unique_id
+),
+ranked AS (
+    SELECT
+        revenue,
+        n_orders,
+        NTILE(10) OVER (ORDER BY revenue DESC, customer_unique_id) AS decile
+    FROM customer_revenue
+)
+SELECT
+    decile,
+    COUNT(*)                                                             AS customers,
+    ROUND(SUM(revenue), 2)                                               AS revenue,
+    COUNT(*) FILTER (WHERE n_orders >= 2)                                AS repeat_customers,
+    ROUND(COUNT(*) FILTER (WHERE n_orders >= 2) * 100.0 / COUNT(*), 2)   AS repeat_rate_pct,
+    ROUND(AVG(revenue), 2)                                               AS avg_revenue_per_customer,
+    ROUND(SUM(revenue) FILTER (WHERE n_orders = 1) / SUM(revenue) * 100, 2)
+                                                                         AS revenue_from_one_time_pct
+FROM ranked
+GROUP BY decile
+ORDER BY decile;
