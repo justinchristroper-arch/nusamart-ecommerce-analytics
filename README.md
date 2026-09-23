@@ -30,8 +30,8 @@ Raw CSV (Olist) → Python/Pandas → PostgreSQL (star schema) → SQL analysis 
 
 Jendela analisis 2017-01 s/d 2018-08. Bukti lengkap, hipotesis, dan rekomendasi: [`docs/insights_and_recommendations.md`](docs/insights_and_recommendations.md).
 
-- **Pertumbuhan hampir seluruhnya dari volume:** revenue Jan–Agu 2018 naik 141,1% dibanding Jan–Agu 2017, tetapi AOV hanya +0,5%, dan order bulanan 2018 justru turun dari 7.069 (Januari) ke 6.351 (Agustus).
-- **Retensi sangat rendah:** 97,0% customer hanya belanja sekali, dan customer yang kembali hanya menyumbang 1,79% revenue.
+- **Pertumbuhan hampir seluruhnya dari volume:** revenue Jan–Agu 2018 naik 141,1% dibanding Jan–Agu 2017, tetapi AOV hanya +0,5%.
+- **Retensi sangat rendah, dan bukan karena customer belum sempat kembali:** 97,0% customer hanya belanja sekali, dan dari kohort Jan–Jun 2017 yang diamati penuh 12 bulan, hanya 3,32% yang order lagi di hari lain.
 - **Revenue terkonsentrasi pada pembelian besar sekali jalan:** 10% customer teratas menyumbang 41,10% revenue, tetapi 91,97% revenue kelompok ini berasal dari customer yang hanya belanja sekali.
 - **Ongkir yang dibayar customer membebani secara tidak merata:** sembilan kategori besar (36,24% revenue) punya freight burden di atas rata-rata 16,63%, dan di beberapa state utara/timur laut bebannya mencapai 24–28%, jauh di atas SP (13,85%).
 - **Mix kategori bergeser** (periode sebanding Jan–Agu): `watches_gifts` naik dari peringkat #6 ke #2, sementara porsi `cool_stuff` turun dari 6,89% ke 3,16%.

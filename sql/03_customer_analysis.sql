@@ -79,6 +79,53 @@ GROUP BY month
 ORDER BY month;
 
 -- ---------------------------------------------------------------------
+-- Q4d: Kohort retensi 12 bulan -- customer yang order pertamanya Jan-Jun 2017
+-- Pertanyaan: apakah repeat rate yang rendah (Q4a) hanya karena banyak
+-- customer belum sempat kembali sebelum data berakhir?
+-- Kohort ini dipilih karena SETIAP anggotanya bisa diamati penuh 12 bulan.
+-- Order pertama paling lambat 30 Jun 2017, jadi 12 bulannya berakhir paling
+-- lambat 30 Jun 2018 -- masih di dalam jendela analisis.
+-- first_order_date diambil dari dim_customer (seluruh histori, tidak difilter).
+-- repeat_12m     = punya order delivered lain pada HARI BERBEDA setelah order
+--                  pertama, paling lambat 12 bulan kemudian (kunjungan ulang)
+-- extra_same_day = punya order lain di hari yang sama dengan order pertama
+--                  (lebih mirip checkout terpisah, jadi dilaporkan terpisah)
+-- ---------------------------------------------------------------------
+WITH cohort AS (
+    SELECT customer_unique_id, first_order_date
+    FROM dim_customer
+    WHERE first_order_date BETWEEN DATE '2017-01-01' AND DATE '2017-06-30'
+),
+cust_orders AS (
+    SELECT DISTINCT f.customer_unique_id, f.order_id, f.order_date
+    FROM fact_sales f
+    JOIN dim_date d ON f.order_date = d.date_key
+    WHERE d.is_analysis_month = TRUE
+),
+per_customer AS (
+    SELECT
+        DATE_TRUNC('month', c.first_order_date)::date                          AS cohort_month,
+        BOOL_OR(o.order_date > c.first_order_date
+                AND o.order_date <= c.first_order_date + INTERVAL '12 months')  AS repeat_12m,
+        COUNT(DISTINCT o.order_id)
+            FILTER (WHERE o.order_date = c.first_order_date) >= 2               AS extra_same_day
+    FROM cohort c
+    JOIN cust_orders o USING (customer_unique_id)
+    GROUP BY c.customer_unique_id, c.first_order_date
+)
+SELECT
+    COALESCE(TO_CHAR(cohort_month, 'YYYY-MM'), 'TOTAL 2017-01 s/d 2017-06')   AS cohort,
+    COUNT(*)                                                                 AS customers,
+    COUNT(*) FILTER (WHERE repeat_12m)                                       AS repeat_12m,
+    ROUND(COUNT(*) FILTER (WHERE repeat_12m) * 100.0 / COUNT(*), 2)          AS repeat_12m_pct,
+    COUNT(*) FILTER (WHERE extra_same_day AND NOT repeat_12m)                AS only_same_day_extra,
+    ROUND(COUNT(*) FILTER (WHERE repeat_12m OR extra_same_day) * 100.0
+          / COUNT(*), 2)                                                     AS repeat_12m_incl_same_day_pct
+FROM per_customer
+GROUP BY ROLLUP (cohort_month)
+ORDER BY cohort_month NULLS LAST;
+
+-- ---------------------------------------------------------------------
 -- Q5a: Konsentrasi revenue per desil customer (di dalam jendela analisis)
 -- Desil 1 = 10% customer dengan revenue tertinggi
 -- ---------------------------------------------------------------------
