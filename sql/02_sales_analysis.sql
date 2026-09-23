@@ -78,14 +78,22 @@ LEFT JOIN monthly prev
 ORDER BY cur.month;
 
 -- ---------------------------------------------------------------------
--- Q1c: Perbandingan periode sebanding -- Jan-Agu 2017 vs Jan-Agu 2018
+-- Q1c: Perbandingan periode sebanding -- Jan-Jul 2017 vs Jan-Jul 2018
 -- Q1b (YoY per bulan kalender) membandingkan bulan yang sama, tapi total
 -- setahun 2017 vs 2018 tidak adil dibandingkan langsung karena 2018 di
--- jendela analisis cuma sampai Agustus. Query ini membatasi KEDUA tahun
--- ke bulan Januari-Agustus saja supaya perbandingan growth setara.
+-- jendela analisis hanya sampai Juli. Query ini membatasi KEDUA tahun ke
+-- Januari s/d bulan terakhir jendela analisis. Bulan terakhir itu dibaca
+-- langsung dari dim_date (tidak diketik manual), jadi perbandingan ini
+-- otomatis ikut menyesuaikan kalau jendela analisis berubah lagi.
 -- ---------------------------------------------------------------------
+WITH last_month AS (
+    SELECT MAX(month) AS m
+    FROM dim_date
+    WHERE is_analysis_month
+      AND year = (SELECT MAX(year) FROM dim_date WHERE is_analysis_month)
+)
 SELECT
-    EXTRACT(YEAR FROM f.order_date)::int                    AS year,
+    d.year                                                  AS year,
     ROUND(SUM(f.price), 2)                                  AS revenue,
     COUNT(DISTINCT f.order_id)                              AS orders,
     COUNT(DISTINCT f.customer_unique_id)                    AS customers,
@@ -93,9 +101,9 @@ SELECT
 FROM fact_sales f
 JOIN dim_date d ON f.order_date = d.date_key
 WHERE d.is_analysis_month = TRUE
-  AND EXTRACT(MONTH FROM f.order_date) BETWEEN 1 AND 8
-GROUP BY 1
-ORDER BY 1;
+  AND d.month <= (SELECT m FROM last_month)
+GROUP BY d.year
+ORDER BY d.year;
 
 -- ---------------------------------------------------------------------
 -- Q2: Revenue per kategori + kontribusi (%)
@@ -118,7 +126,7 @@ LIMIT 15;
 -- Q2b: Apakah kontribusi kategori stabil antar-tahun?
 -- (share dihitung dalam masing-masing tahun; 2016 tidak akan muncul
 -- karena seluruh bulan 2016 di luar jendela analisis, dan 2018 hanya
--- berisi Jan-Agu)
+-- berisi Jan-Jul)
 -- ---------------------------------------------------------------------
 WITH cat_year AS (
     SELECT
@@ -141,16 +149,23 @@ FROM cat_year
 ORDER BY year, rank_in_year;
 
 -- ---------------------------------------------------------------------
--- Q2c: Pergeseran kategori dengan periode sebanding (Jan-Agu 2017 vs Jan-Agu 2018)
--- Q2b membandingkan 2017 SETAHUN PENUH dengan 2018 yang hanya Jan-Agu.
+-- Q2c: Pergeseran kategori dengan periode sebanding (Jan-Jul 2017 vs Jan-Jul 2018)
+-- Q2b membandingkan 2017 SETAHUN PENUH dengan 2018 yang hanya sampai Juli.
 -- Padahal 2017 memuat November (Black Friday, bulan revenue tertinggi) dan
 -- Desember, sehingga kategori musiman bisa tampak "turun" di 2018 hanya
 -- karena bulan-bulan itu belum ada. Query ini membatasi KEDUA tahun ke
--- Januari-Agustus (sama seperti Q1c) supaya pergeseran share adil.
+-- Januari s/d bulan terakhir jendela analisis (dibaca dari dim_date,
+-- sama seperti Q1c) supaya pergeseran share adil.
 -- Kolom terakhir menunjukkan porsi revenue 2017 tiap kategori yang jatuh
 -- di Nov-Des, untuk melihat kategori mana yang musiman.
 -- ---------------------------------------------------------------------
-WITH base AS (
+WITH last_month AS (
+    SELECT MAX(month) AS m
+    FROM dim_date
+    WHERE is_analysis_month
+      AND year = (SELECT MAX(year) FROM dim_date WHERE is_analysis_month)
+),
+base AS (
     SELECT
         EXTRACT(YEAR FROM f.order_date)::int   AS year,
         EXTRACT(MONTH FROM f.order_date)::int  AS month,
@@ -161,10 +176,10 @@ WITH base AS (
     JOIN dim_date d ON f.order_date = d.date_key
     WHERE d.is_analysis_month = TRUE
 ),
-jan_aug AS (
+same_months AS (
     SELECT year, category_en, SUM(price) AS revenue
     FROM base
-    WHERE month BETWEEN 1 AND 8
+    WHERE month <= (SELECT m FROM last_month)
     GROUP BY 1, 2
 ),
 shares AS (
@@ -174,7 +189,7 @@ shares AS (
         revenue,
         revenue / SUM(revenue) OVER (PARTITION BY year) * 100  AS share_pct,
         RANK() OVER (PARTITION BY year ORDER BY revenue DESC)  AS rank_in_year
-    FROM jan_aug
+    FROM same_months
 ),
 musim_2017 AS (
     SELECT
@@ -186,8 +201,8 @@ musim_2017 AS (
 )
 SELECT
     category_en,
-    ROUND(a.revenue, 2)                   AS revenue_2017_jan_aug,
-    ROUND(b.revenue, 2)                   AS revenue_2018_jan_aug,
+    ROUND(a.revenue, 2)                   AS revenue_2017_same_months,
+    ROUND(b.revenue, 2)                   AS revenue_2018_same_months,
     ROUND(a.share_pct, 2)                 AS share_2017_pct,
     ROUND(b.share_pct, 2)                 AS share_2018_pct,
     ROUND(b.share_pct - a.share_pct, 2)   AS share_change_pp,
@@ -197,7 +212,7 @@ SELECT
 FROM (SELECT * FROM shares WHERE year = 2017) a
 FULL OUTER JOIN (SELECT * FROM shares WHERE year = 2018) b USING (category_en)
 LEFT JOIN musim_2017 m USING (category_en)
-ORDER BY revenue_2018_jan_aug DESC NULLS LAST;
+ORDER BY revenue_2018_same_months DESC NULLS LAST;
 
 -- ---------------------------------------------------------------------
 -- Q3: Performa per wilayah (state customer)

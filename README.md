@@ -28,20 +28,20 @@ Raw CSV (Olist) → Python/Pandas → PostgreSQL (star schema) → SQL analysis 
 
 ## Key insights
 
-Jendela analisis 2017-01 s/d 2018-08. Bukti lengkap, hipotesis, dan rekomendasi: [`docs/insights_and_recommendations.md`](docs/insights_and_recommendations.md).
+Jendela analisis 2017-01 s/d 2018-07. Bukti lengkap, hipotesis, dan rekomendasi: [`docs/insights_and_recommendations.md`](docs/insights_and_recommendations.md).
 
-- **Pertumbuhan hampir seluruhnya dari volume:** revenue Jan–Agu 2018 naik 141,1% dibanding Jan–Agu 2017, tetapi AOV hanya +0,5%.
+- **Pertumbuhan hampir seluruhnya dari volume:** revenue Jan–Jul 2018 naik 161,6% dibanding Jan–Jul 2017, tetapi AOV hanya +0,3%.
 - **Retensi sangat rendah, dan bukan karena customer belum sempat kembali:** 97,0% customer hanya belanja sekali, dan dari kohort Jan–Jun 2017 yang diamati penuh 12 bulan, hanya 3,32% yang order lagi di hari lain.
-- **Revenue terkonsentrasi pada pembelian besar sekali jalan:** 10% customer teratas menyumbang 41,10% revenue, tetapi 91,97% revenue kelompok ini berasal dari customer yang hanya belanja sekali.
-- **Ongkir yang dibayar customer membebani secara tidak merata:** sembilan kategori besar (36,24% revenue) punya freight burden di atas rata-rata 16,63%, dan di beberapa state utara/timur laut bebannya mencapai 24–28%, jauh di atas SP (13,85%).
-- **Mix kategori bergeser** (periode sebanding Jan–Agu): `watches_gifts` naik dari peringkat #6 ke #2, sementara porsi `cool_stuff` turun dari 6,89% ke 3,16%.
+- **Revenue terkonsentrasi pada pembelian besar sekali jalan:** 10% customer teratas menyumbang 41,09% revenue, tetapi 91,99% revenue kelompok ini berasal dari customer yang hanya belanja sekali.
+- **Ongkir yang dibayar customer membebani secara tidak merata:** sembilan kategori besar (36,18% revenue) punya freight burden di atas rata-rata 16,57%, dan di beberapa state utara/timur laut bebannya mencapai sekitar 24–28%, jauh di atas SP (13,80%).
+- **Mix kategori bergeser** (periode sebanding Jan–Jul): `watches_gifts` naik dari peringkat #6 ke #2, sementara porsi `cool_stuff` turun dari 6,89% ke 3,32%.
 
 ## Keputusan data yang penting
 
 - Revenue hanya dari order `delivered`, tanpa ongkir.
 - Customer diidentifikasi dengan `customer_unique_id` (bukan `customer_id`, yang berbeda di setiap order).
 - Dataset tidak memiliki cost, sehingga **profit tidak dianalisis**. Sebagai gantinya dipakai proxy *freight burden* = Σ ongkir ÷ Σ harga barang. Ongkir (`freight_value`) di dataset ini **dibayar oleh customer**, jadi freight burden mengukur **beban ongkir yang ditanggung customer** relatif terhadap harga barang — bukan profit, dan bukan biaya perusahaan.
-- Analisis memakai **jendela 2017-01 s/d 2018-08**. Bulan di kedua ujung dataset yang datanya tidak lengkap ditandai lewat kolom `dim_date.is_analysis_month` dan dikecualikan secara konsisten di SQL maupun dashboard. Perbandingan antartahun memakai periode sebanding Jan–Agu.
+- Analisis memakai **jendela 2017-01 s/d 2018-07**. Bulan di kedua ujung dataset yang datanya tidak lengkap ditandai lewat kolom `dim_date.is_analysis_month` dan dikecualikan secara konsisten di SQL maupun dashboard. Kelengkapan bulan dicek dari total bulanan, porsi order delivered, dan — untuk bulan terakhir — jumlah order **per hari**. Cek harian inilah yang menemukan bahwa pengumpulan data Agustus 2018 berakhir di tengah bulan. Perbandingan antartahun memakai periode sebanding Jan–Jul.
 
 ## Cara menjalankan ulang
 

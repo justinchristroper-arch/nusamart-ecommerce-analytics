@@ -98,4 +98,4 @@ NusaMart adalah marketplace multi-kategori dengan pelanggan di banyak wilayah. D
 
 - Semua penjelasan penyebab di dokumen insight adalah **hipotesis**, karena dataset tidak memuat konteks bisnis (promo, kompetitor, dll.).
 - Dampak rekomendasi tidak dikuantifikasi tanpa eksperimen; ditulis sebagai arah dampak.
-- Bulan awal/akhir dataset yang tidak lengkap dikecualikan dari analisis tren (lihat notebook bagian 6).
+- Bulan awal/akhir dataset yang tidak lengkap dikecualikan dari analisis. Jendela analisis: **2017-01 s/d 2018-07**. Kelengkapan bulan dicek dengan tiga cek: total order bulanan, porsi order delivered, dan — untuk bulan terakhir jendela — jumlah order per hari (rata-rata 7 hari terakhir minimal 80% dari rata-rata hari-hari sebelumnya). Cek harian ditambahkan setelah ditemukan bahwa data Agustus 2018 terpotong setelah tanggal 21, padahal total bulanannya tampak normal (lihat notebook bagian 6).

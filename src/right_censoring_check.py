@@ -32,7 +32,7 @@ OUT = ROOT / "results"
 # Status yang belum final (masih mungkin menjadi delivered) vs yang sudah final
 IN_PROCESS = ["shipped", "invoiced", "processing", "approved", "created"]
 CANCELLED = ["canceled", "unavailable"]
-ANALYSIS_MONTHS = ("2017-01", "2018-08")  # sama dengan dim_date.is_analysis_month
+ANALYSIS_MONTHS = ("2017-01", "2018-07")  # sama dengan dim_date.is_analysis_month
 
 orders = pd.read_csv(
     RAW,

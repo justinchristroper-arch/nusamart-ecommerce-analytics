@@ -15,7 +15,7 @@ UNION ALL SELECT 'dim_product',  COUNT(*) FROM dim_product
 UNION ALL SELECT 'dim_date',     COUNT(*) FROM dim_date;
 
 -- ---------------------------------------------------------------------
--- KPI TOTAL -- jendela analisis (2017-01 s/d 2018-08)
+-- KPI TOTAL -- jendela analisis (2017-01 s/d 2018-07)
 -- Ini angka acuan utama. Harus identik dengan tabel referensi di
 -- PROGRESS.md bagian 1 dan dengan KPI card Power BI.
 -- ---------------------------------------------------------------------
@@ -70,8 +70,8 @@ SELECT
 
 -- ---------------------------------------------------------------------
 -- KPI per tahun, DIFILTER jendela analisis (untuk cek filter tahun di
--- Power BI). 2016 tidak akan muncul (seluruhnya di luar jendela);
--- 2018 hanya berisi Januari-Agustus.
+-- Power BI). 2016 tidak akan muncul karena seluruhnya di luar jendela,
+-- dan 2018 hanya berisi Januari-Juli.
 -- ---------------------------------------------------------------------
 SELECT
     EXTRACT(YEAR FROM f.order_date)::int                    AS year,

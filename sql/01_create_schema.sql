@@ -19,7 +19,7 @@ CREATE TABLE dim_date (
     month_name   TEXT NOT NULL,
     year_month   TEXT NOT NULL,       -- contoh: '2017-11'
     day_of_week  INT  NOT NULL,       -- 1 = Senin ... 7 = Minggu
-    -- TRUE = tanggal ini masuk bulan yang datanya lengkap (2017-01 s/d 2018-08).
+    -- TRUE = tanggal ini masuk bulan yang datanya lengkap (2017-01 s/d 2018-07).
     -- Keputusan dari notebook bagian 6. Dipakai sebagai filter standar di SQL &
     -- Power BI supaya angka di semua tool identik.
     is_analysis_month BOOLEAN NOT NULL
