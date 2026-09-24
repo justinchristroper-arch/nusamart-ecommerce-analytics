@@ -1,0 +1,78 @@
+
+DEFINE
+    MEASURE fact_sales[Avg Item Price] = DIVIDE ( [Total Revenue], [Units Sold] )
+    MEASURE fact_sales[Freight per Unit] = DIVIDE ( [Total Freight], [Units Sold] )
+    MEASURE fact_sales[Revenue PM] =
+        CALCULATE ( [Total Revenue], DATEADD ( dim_date[date_key], -1, MONTH ), dim_date[is_analysis_month] = TRUE () )
+    MEASURE fact_sales[Revenue MoM %] =
+        IF ( HASONEVALUE ( dim_date[year_month] ), DIVIDE ( [Total Revenue] - [Revenue PM], [Revenue PM] ) )
+    MEASURE fact_sales[Revenue PY] =
+        CALCULATE ( [Total Revenue], SAMEPERIODLASTYEAR ( dim_date[date_key] ), dim_date[is_analysis_month] = TRUE () )
+    MEASURE fact_sales[Revenue YoY %] =
+        IF ( HASONEVALUE ( dim_date[year] ), DIVIDE ( [Total Revenue] - [Revenue PY], [Revenue PY] ) )
+    MEASURE fact_sales[Revenue YoY Label] =
+        VAR Chg = [Revenue YoY %]
+        RETURN IF ( ISBLANK ( Chg ), "YoY tidak tersedia", "YoY " & FORMAT ( Chg, "+0.0%;-0.0%" ) )
+    MEASURE fact_sales[Orders PY] =
+        CALCULATE ( [Total Orders], SAMEPERIODLASTYEAR ( dim_date[date_key] ), dim_date[is_analysis_month] = TRUE () )
+    MEASURE fact_sales[Orders YoY %] =
+        IF ( HASONEVALUE ( dim_date[year] ), DIVIDE ( [Total Orders] - [Orders PY], [Orders PY] ) )
+    MEASURE fact_sales[Orders YoY Label] =
+        VAR Chg = [Orders YoY %]
+        RETURN IF ( ISBLANK ( Chg ), "YoY tidak tersedia", "YoY " & FORMAT ( Chg, "+0.0%;-0.0%" ) )
+    MEASURE fact_sales[Customers PY] =
+        CALCULATE ( [Total Customers], SAMEPERIODLASTYEAR ( dim_date[date_key] ), dim_date[is_analysis_month] = TRUE () )
+    MEASURE fact_sales[Customers YoY %] =
+        IF ( HASONEVALUE ( dim_date[year] ), DIVIDE ( [Total Customers] - [Customers PY], [Customers PY] ) )
+    MEASURE fact_sales[Customers YoY Label] =
+        VAR Chg = [Customers YoY %]
+        RETURN IF ( ISBLANK ( Chg ), "YoY tidak tersedia", "YoY " & FORMAT ( Chg, "+0.0%;-0.0%" ) )
+    MEASURE fact_sales[AOV PY] =
+        CALCULATE ( [AOV], SAMEPERIODLASTYEAR ( dim_date[date_key] ), dim_date[is_analysis_month] = TRUE () )
+    MEASURE fact_sales[AOV YoY %] =
+        IF ( HASONEVALUE ( dim_date[year] ), DIVIDE ( [AOV] - [AOV PY], [AOV PY] ) )
+    MEASURE fact_sales[AOV YoY Label] =
+        VAR Chg = [AOV YoY %]
+        RETURN IF ( ISBLANK ( Chg ), "YoY tidak tersedia", "YoY " & FORMAT ( Chg, "+0.0%;-0.0%" ) )
+    MEASURE fact_sales[Returning Customer %] = DIVIDE ( [Returning Customers], [Total Customers] )
+    MEASURE fact_sales[New Customer Revenue] =
+        VAR MinDate = MIN ( dim_date[date_key] )
+        VAR MaxDate = MAX ( dim_date[date_key] )
+        RETURN
+            CALCULATE (
+                [Total Revenue],
+                FILTER (
+                    ALL ( dim_customer[first_order_date] ),
+                    dim_customer[first_order_date] >= MinDate
+                        && dim_customer[first_order_date] <= MaxDate
+                )
+            )
+    MEASURE fact_sales[Returning Customer Revenue] = [Total Revenue] - [New Customer Revenue]
+    MEASURE fact_sales[Returning Revenue % (monthly basis)] =
+        DIVIDE ( SUMX ( VALUES ( dim_date[year_month] ), [Returning Customer Revenue] ), [Total Revenue] )
+    MEASURE fact_sales[Category Revenue Share %] =
+        DIVIDE ( [Total Revenue], CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_product ) ) )
+    MEASURE fact_sales[State Revenue Share %] =
+        DIVIDE ( [Total Revenue], CALCULATE ( [Total Revenue], REMOVEFILTERS ( fact_sales[customer_state] ) ) )
+    MEASURE fact_sales[Overall Freight Burden % (proxy)] =
+        CALCULATE ( [Freight Burden % (proxy)], REMOVEFILTERS ( dim_product ) )
+    MEASURE fact_sales[Avg Revenue per Category] =
+        VAR TotalAllCategories = CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_product ) )
+        VAR CategoriesWithSales =
+            CALCULATE (
+                COUNTROWS ( FILTER ( VALUES ( dim_product[category_en] ), [Total Revenue] > 0 ) ),
+                REMOVEFILTERS ( dim_product )
+            )
+        RETURN DIVIDE ( TotalAllCategories, CategoriesWithSales )
+    MEASURE fact_sales[Q7 High Burden Flag] =
+        IF (
+            [Total Revenue] > [Avg Revenue per Category]
+                && [Freight Burden % (proxy)] > [Overall Freight Burden % (proxy)],
+            1
+        )
+
+EVALUATE
+ROW (
+    "Returning Revenue % (harus ~0,0176)", [Returning Revenue % (monthly basis)],
+    "Avg Revenue per Category (harus ~166789,87)", [Avg Revenue per Category]
+)

@@ -1,0 +1,356 @@
+table fact_sales
+	lineageTag: 7209444a-0085-4611-b3de-c46adf36af76
+
+	measure 'Total Revenue' = SUM ( fact_sales[price] )
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 2df63f74-a118-49de-b33f-47f7c1159439
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Total Orders' = DISTINCTCOUNT ( fact_sales[order_id] )
+		formatString: #,0
+		lineageTag: e8b4cd04-a38b-4af1-a296-ddf17fd137b7
+
+	measure 'Total Customers' = DISTINCTCOUNT ( fact_sales[customer_unique_id] )
+		formatString: #,0
+		lineageTag: 54222ee1-4f02-4ceb-b73b-6ff846fd2203
+
+	measure AOV = DIVIDE ( [Total Revenue], [Total Orders] )
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 25528815-a3d9-4824-96f3-040729b0d045
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Units Sold' = COUNTROWS ( fact_sales )
+		formatString: #,0
+		lineageTag: 011c6e67-d335-44d0-8959-3ed81ace43ea
+
+	measure 'Total Freight' = SUM ( fact_sales[freight_value] )
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 6f0202ea-b578-4802-8569-d25dfa0e5e70
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Freight Burden % (proxy)' = DIVIDE ( [Total Freight], [Total Revenue] )
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 6cee5fce-4baa-4cc6-be24-e7c491a15c0a
+
+	measure 'New Customers' =
+			
+			VAR MinDate = MIN ( dim_date[date_key] )
+			VAR MaxDate = MAX ( dim_date[date_key] )
+			RETURN
+			    CALCULATE (
+			        [Total Customers],
+			        FILTER (
+			            ALL ( dim_customer[first_order_date] ),
+			            dim_customer[first_order_date] >= MinDate
+			                && dim_customer[first_order_date] <= MaxDate
+			        )
+			    )
+		formatString: #,0
+		lineageTag: ce628e7a-e8a0-4bc3-9513-d68c46f39542
+
+	measure 'Returning Customers' = [Total Customers] - [New Customers]
+		formatString: #,0
+		lineageTag: 1d66e6ff-eeb7-4541-9852-c92479dd1a56
+
+	measure 'Repeat Customers' =
+			
+			COUNTROWS (
+			    FILTER (
+			        VALUES ( fact_sales[customer_unique_id] ),
+			        [Total Orders] >= 2
+			    )
+			)
+		formatString: #,0
+		lineageTag: c2d47da5-0d98-4068-b74c-f4de8078e0ae
+
+	measure 'Repeat Rate %' = DIVIDE ( [Repeat Customers], [Total Customers] )
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 5840097f-ba01-4810-a0be-37a4bd151b16
+
+	measure 'Avg Item Price' = DIVIDE ( [Total Revenue], [Units Sold] )
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 42218193-e754-4afb-8434-c984b2f86995
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Freight per Unit' = DIVIDE ( [Total Freight], [Units Sold] )
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 64767a82-f9a1-420c-b77a-33402bccb89f
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Revenue PM' = ```
+			
+			        CALCULATE ( [Total Revenue], DATEADD ( dim_date[date_key], -1, MONTH ), dim_date[is_analysis_month] = TRUE () )
+			```
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 98a02757-ba70-4d2c-b120-6693bc6aaca5
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Revenue MoM %' = ```
+			
+			        IF ( HASONEVALUE ( dim_date[year_month] ), DIVIDE ( [Total Revenue] - [Revenue PM], [Revenue PM] ) )
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 880706e7-52ee-49ce-9ead-a8d1878410b2
+
+	measure 'Revenue PY' = ```
+			
+			        CALCULATE ( [Total Revenue], SAMEPERIODLASTYEAR ( dim_date[date_key] ), dim_date[is_analysis_month] = TRUE () )
+			```
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: d3feb587-3008-462b-8666-3c740553cca4
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Revenue YoY %' = ```
+			
+			        IF ( HASONEVALUE ( dim_date[year] ), DIVIDE ( [Total Revenue] - [Revenue PY], [Revenue PY] ) )
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: fbde5045-6108-4ca2-a08e-c4015ac18f78
+
+	measure 'Revenue YoY Label' = ```
+			
+			        VAR Chg = [Revenue YoY %]
+			        RETURN IF ( ISBLANK ( Chg ), "YoY tidak tersedia", "YoY " & FORMAT ( Chg, "+0.0%;-0.0%" ) )
+			```
+		lineageTag: 7b55308b-4281-4511-91f7-9d6d5e0edbdb
+
+	measure 'Orders PY' = ```
+			
+			        CALCULATE ( [Total Orders], SAMEPERIODLASTYEAR ( dim_date[date_key] ), dim_date[is_analysis_month] = TRUE () )
+			```
+		formatString: #,0
+		lineageTag: fa9dcc84-2628-4eb9-bee9-170d855a069f
+
+	measure 'Orders YoY %' = ```
+			
+			        IF ( HASONEVALUE ( dim_date[year] ), DIVIDE ( [Total Orders] - [Orders PY], [Orders PY] ) )
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 18b3ba31-5c27-44ea-93df-afd89d91a0d4
+
+	measure 'Orders YoY Label' = ```
+			
+			        VAR Chg = [Orders YoY %]
+			        RETURN IF ( ISBLANK ( Chg ), "YoY tidak tersedia", "YoY " & FORMAT ( Chg, "+0.0%;-0.0%" ) )
+			```
+		lineageTag: df205f52-9956-4d98-8fdb-10152f78ed3d
+
+	measure 'Customers PY' = ```
+			
+			        CALCULATE ( [Total Customers], SAMEPERIODLASTYEAR ( dim_date[date_key] ), dim_date[is_analysis_month] = TRUE () )
+			```
+		formatString: #,0
+		lineageTag: 5d35c8d1-2dab-45ad-9b98-4fcd4fa3137f
+
+	measure 'Customers YoY %' = ```
+			
+			        IF ( HASONEVALUE ( dim_date[year] ), DIVIDE ( [Total Customers] - [Customers PY], [Customers PY] ) )
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 88799773-6d47-4eea-8334-fc6752506192
+
+	measure 'Customers YoY Label' = ```
+			
+			        VAR Chg = [Customers YoY %]
+			        RETURN IF ( ISBLANK ( Chg ), "YoY tidak tersedia", "YoY " & FORMAT ( Chg, "+0.0%;-0.0%" ) )
+			```
+		lineageTag: 977608cc-ead2-4aaf-b024-b0d31ecff7a1
+
+	measure 'AOV PY' = ```
+			
+			        CALCULATE ( [AOV], SAMEPERIODLASTYEAR ( dim_date[date_key] ), dim_date[is_analysis_month] = TRUE () )
+			```
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 14804f16-5402-4d10-9c40-352ea32e5f51
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'AOV YoY %' = ```
+			
+			        IF ( HASONEVALUE ( dim_date[year] ), DIVIDE ( [AOV] - [AOV PY], [AOV PY] ) )
+			```
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: ac4b246e-87ce-4842-9af1-3a352539f293
+
+	measure 'AOV YoY Label' = ```
+			
+			        VAR Chg = [AOV YoY %]
+			        RETURN IF ( ISBLANK ( Chg ), "YoY tidak tersedia", "YoY " & FORMAT ( Chg, "+0.0%;-0.0%" ) )
+			```
+		lineageTag: 894db7d5-33db-4942-b3f0-20c28a76143a
+
+	measure 'Returning Customer %' = DIVIDE ( [Returning Customers], [Total Customers] )
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: e25d52c2-9823-43ee-a77d-50114e911420
+
+	measure 'New Customer Revenue' = ```
+			
+			        VAR MinDate = MIN ( dim_date[date_key] )
+			        VAR MaxDate = MAX ( dim_date[date_key] )
+			        RETURN
+			            CALCULATE (
+			                [Total Revenue],
+			                FILTER (
+			                    ALL ( dim_customer[first_order_date] ),
+			                    dim_customer[first_order_date] >= MinDate
+			                        && dim_customer[first_order_date] <= MaxDate
+			                )
+			            )
+			```
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: d2cf1ffe-16c7-49ff-877c-efc6763cc051
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Returning Customer Revenue' = [Total Revenue] - [New Customer Revenue]
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 43158b40-462e-45ff-ac93-aa5b9e66a551
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Returning Revenue % (monthly basis)' = ```
+			
+			        DIVIDE ( SUMX ( VALUES ( dim_date[year_month] ), [Returning Customer Revenue] ), [Total Revenue] )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: ccf91227-9572-42f5-9cbf-bce1b30316f1
+
+	measure 'Category Revenue Share %' = ```
+			
+			        DIVIDE ( [Total Revenue], CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_product ) ) )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: d8588645-2975-4c00-8a54-cef0e723b337
+
+	measure 'State Revenue Share %' = ```
+			
+			        DIVIDE ( [Total Revenue], CALCULATE ( [Total Revenue], REMOVEFILTERS ( fact_sales[customer_state] ) ) )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 697a9214-6643-47ff-ab36-1a7c2578b63e
+
+	measure 'Overall Freight Burden % (proxy)' = ```
+			
+			        CALCULATE ( [Freight Burden % (proxy)], REMOVEFILTERS ( dim_product ) )
+			```
+		formatString: 0.00%;-0.00%;0.00%
+		lineageTag: 2079c1a2-78d3-4bc3-9405-d421482859bd
+
+	measure 'Avg Revenue per Category' = ```
+			
+			        VAR TotalAllCategories = CALCULATE ( [Total Revenue], REMOVEFILTERS ( dim_product ) )
+			        VAR CategoriesWithSales =
+			            CALCULATE (
+			                COUNTROWS ( FILTER ( VALUES ( dim_product[category_en] ), [Total Revenue] > 0 ) ),
+			                REMOVEFILTERS ( dim_product )
+			            )
+			        RETURN DIVIDE ( TotalAllCategories, CategoriesWithSales )
+			```
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: 9cc09904-fa49-4705-bfea-e6c444440791
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	measure 'Q7 High Burden Flag' = ```
+			
+			        IF (
+			            [Total Revenue] > [Avg Revenue per Category]
+			                && [Freight Burden % (proxy)] > [Overall Freight Burden % (proxy)],
+			            1
+			        )
+			```
+		formatString: #,0
+		lineageTag: 280ddbee-6fa1-462e-9cef-53ddf3b34061
+
+	column order_id
+		dataType: string
+		lineageTag: fffa2a92-8b44-4276-b688-ea61b2923e7b
+		summarizeBy: none
+		sourceColumn: order_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_item_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 85cc08ab-c5fd-47b3-b674-0eea11d75e30
+		summarizeBy: sum
+		sourceColumn: order_item_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_unique_id
+		dataType: string
+		lineageTag: 352084b6-73f0-4a5c-bc9b-8b4f0af4e923
+		summarizeBy: none
+		sourceColumn: customer_unique_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: string
+		lineageTag: ba51cbe5-a645-4308-b2b3-3e73e05d8f34
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column order_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 0cae4408-87f5-4664-b33a-724d94487e2a
+		summarizeBy: none
+		sourceColumn: order_date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column customer_state
+		dataType: string
+		lineageTag: 10d685f4-d165-42df-ad1c-df4321966463
+		summarizeBy: none
+		sourceColumn: customer_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column price
+		dataType: double
+		lineageTag: 58707e40-addf-4f33-a66d-99317e90a3b4
+		summarizeBy: sum
+		sourceColumn: price
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column freight_value
+		dataType: double
+		lineageTag: 2989e20c-114d-464f-9425-cff33e382e6d
+		summarizeBy: sum
+		sourceColumn: freight_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition fact_sales = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5433", "nusamart"),
+				    public_fact_sales = Source{[Schema="public",Item="fact_sales"]}[Data]
+				in
+				    public_fact_sales
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

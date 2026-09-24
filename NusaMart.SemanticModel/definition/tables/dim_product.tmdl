@@ -1,0 +1,40 @@
+table dim_product
+	lineageTag: 58db4efb-923b-4f31-9ca6-f3fc33919e9e
+
+	column product_id
+		dataType: string
+		lineageTag: e7716e91-5cb8-4338-b5c1-3e458d0ba071
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_en
+		dataType: string
+		lineageTag: 748ed40b-6b14-40be-a63e-c5b22a8172d4
+		summarizeBy: none
+		sourceColumn: category_en
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_pt
+		dataType: string
+		lineageTag: 5cf11bf0-c96c-45a8-8743-b9a9c9088816
+		summarizeBy: none
+		sourceColumn: category_pt
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_product = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5433", "nusamart"),
+				    public_dim_product = Source{[Schema="public",Item="dim_product"]}[Data]
+				in
+				    public_dim_product
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

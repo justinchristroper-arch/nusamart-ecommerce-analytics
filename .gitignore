@@ -12,3 +12,12 @@ __pycache__/
 .ipynb_checkpoints/
 .venv/
 venv/
+
+# Power BI Project (PBIP)
+# cache.abf = salinan data hasil Import (berisi data)
+# localSettings.json = pengaturan lokal + tanda tangan keamanan yang terikat ke komputer ini
+**/.pbi/cache.abf
+**/.pbi/localSettings.json
+*.abf
+# File .pbix juga menyimpan salinan data; cadangannya disimpan di luar repo
+*.pbix

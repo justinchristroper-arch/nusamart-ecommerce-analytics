@@ -1,0 +1,56 @@
+table dim_customer
+	lineageTag: 4830c30b-d357-4798-afc7-566e1bdcc8a7
+
+	column customer_unique_id
+		dataType: string
+		lineageTag: 7e1a00cb-b49f-42db-b83e-d608a8c9c81c
+		summarizeBy: none
+		sourceColumn: customer_unique_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_city
+		dataType: string
+		lineageTag: d81d6296-7e75-4f18-abde-7d6b952f5885
+		summarizeBy: none
+		sourceColumn: customer_city
+
+		annotation SummarizationSetBy = Automatic
+
+	column customer_state
+		dataType: string
+		lineageTag: 8067c7f0-877b-44ff-91b8-fb3a8580e3e3
+		summarizeBy: none
+		sourceColumn: customer_state
+
+		annotation SummarizationSetBy = Automatic
+
+	column first_order_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 02c28b22-4170-4626-9757-43598b8e5ce1
+		summarizeBy: none
+		sourceColumn: first_order_date
+
+		variation Variation
+			isDefault
+			relationship: 0c509d45-02f3-4242-9ac9-e7ec40970a2b
+			defaultHierarchy: LocalDateTable_f130840d-1200-4b69-b894-6b2671346c18.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	partition dim_customer = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5433", "nusamart"),
+				    public_dim_customer = Source{[Schema="public",Item="dim_customer"]}[Data]
+				in
+				    public_dim_customer
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+
