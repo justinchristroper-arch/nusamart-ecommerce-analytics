@@ -9,7 +9,7 @@ model Model
 
 annotation __PBI_TimeIntelligenceEnabled = 1
 
-annotation PBI_QueryOrder = ["dim_customer","dim_product","fact_sales","dim_date"]
+annotation PBI_QueryOrder = ["dim_customer","dim_product","fact_sales","dim_date","q5a_decile"]
 
 annotation PBI_ProTooling = ["DaxQueryView_Desktop","DevMode"]
 
@@ -19,6 +19,7 @@ ref table LocalDateTable_f130840d-1200-4b69-b894-6b2671346c18
 ref table dim_product
 ref table fact_sales
 ref table dim_date
+ref table q5a_decile
 
 ref cultureInfo en-US
 

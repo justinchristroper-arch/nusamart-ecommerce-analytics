@@ -55,6 +55,19 @@
             "width": 234
           },
           "zIndex": 3
+        },
+        {
+          "location": {
+            "x": 858.04994569650114,
+            "y": 244.15780186020305
+          },
+          "nodeIndex": "q5a_decile",
+          "nodeLineageTag": "95fb4047-1921-44e3-9c60-07fa75a0e160",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
         }
       ],
       "name": "All tables",

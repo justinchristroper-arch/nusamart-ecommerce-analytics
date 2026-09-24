@@ -1,0 +1,60 @@
+table q5a_decile
+	lineageTag: 95fb4047-1921-44e3-9c60-07fa75a0e160
+
+	column decile
+		dataType: int64
+		formatString: 0
+		lineageTag: 45eb0c36-323c-4576-afea-8428f18eb6b2
+		summarizeBy: none
+		sourceColumn: decile
+
+		annotation SummarizationSetBy = User
+
+	column customers
+		dataType: int64
+		formatString: #,0
+		lineageTag: 14549ba4-640b-415f-a1ef-9f31ad640516
+		summarizeBy: sum
+		sourceColumn: customers
+
+		annotation SummarizationSetBy = Automatic
+
+	column revenue
+		dataType: double
+		formatString: "R$"\ #,0.00;-"R$"\ #,0.00;"R$"\ #,0.00
+		lineageTag: d8963fe1-1bed-4099-b9b7-b4e5b1c46d33
+		summarizeBy: sum
+		sourceColumn: revenue
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"pt-BR"}
+
+	column revenue_share_pct
+		dataType: double
+		formatString: 0.00
+		lineageTag: e5dfe5c4-e9d9-4d06-b48a-e699c2a75d18
+		summarizeBy: sum
+		sourceColumn: revenue_share_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	column cumulative_share_pct
+		dataType: double
+		formatString: 0.00
+		lineageTag: 4a977d6f-aeca-41d8-b5f2-44065840bfd0
+		summarizeBy: sum
+		sourceColumn: cumulative_share_pct
+
+		annotation SummarizationSetBy = Automatic
+
+	partition q5a_decile = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database("localhost:5433", "nusamart", [Query="WITH customer_revenue AS (SELECT f.customer_unique_id, SUM(f.price) AS revenue FROM fact_sales f JOIN dim_date d ON f.order_date = d.date_key WHERE d.is_analysis_month = TRUE GROUP BY f.customer_unique_id), ranked AS (SELECT revenue, NTILE(10) OVER (ORDER BY revenue DESC) AS decile FROM customer_revenue) SELECT decile, COUNT(*) AS customers, ROUND(SUM(revenue), 2) AS revenue, ROUND(SUM(revenue) / SUM(SUM(revenue)) OVER () * 100, 2) AS revenue_share_pct, ROUND(SUM(SUM(revenue)) OVER (ORDER BY decile) / SUM(SUM(revenue)) OVER () * 100, 2) AS cumulative_share_pct FROM ranked GROUP BY decile ORDER BY decile"])
+				in
+				    Source
+
+	annotation PBI_ResultType = Table
+

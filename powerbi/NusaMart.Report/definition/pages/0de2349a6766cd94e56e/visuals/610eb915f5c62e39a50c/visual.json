@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "610eb915f5c62e39a50c",
+  "position": {
+    "x": 24,
+    "y": 1018,
+    "z": 10,
+    "height": 56,
+    "width": 1872,
+    "tabOrder": 10
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Definisi · Revenue = Σ harga barang pada order delivered (ongkir tidak termasuk) · AOV = revenue ÷ jumlah order · Freight burden (proxy) = Σ ongkir yang dibayar customer ÷ Σ harga barang — bukan profit, bukan biaya perusahaan · YoY = dibanding periode yang sama tahun sebelumnya; hanya tersedia jika satu tahun dipilih dan pembandingnya ada di jendela analisis · NusaMart adalah nama fiktif; data: Brazilian E-Commerce Public Dataset by Olist (Kaggle).",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "color": "#605E5C"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,16 +1,16 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
-  "name": "17eedbf6ca1af0391d6c",
+  "name": "01aaee7edeb8582dc050",
   "position": {
     "x": 24,
-    "y": 686,
-    "z": 6,
-    "height": 336,
-    "width": 1872,
-    "tabOrder": 6
+    "y": 302,
+    "z": 7,
+    "height": 704,
+    "width": 1116,
+    "tabOrder": 7
   },
   "visual": {
-    "visualType": "lineClusteredColumnComboChart",
+    "visualType": "lineStackedColumnComboChart",
     "query": {
       "queryState": {
         "Category": {
@@ -20,14 +20,14 @@
                 "Column": {
                   "Expression": {
                     "SourceRef": {
-                      "Entity": "fact_sales"
+                      "Entity": "dim_date"
                     }
                   },
-                  "Property": "customer_state"
+                  "Property": "year_month"
                 }
               },
-              "queryRef": "fact_sales.customer_state",
-              "nativeQueryRef": "customer_state",
+              "queryRef": "dim_date.year_month",
+              "nativeQueryRef": "year_month",
               "active": true
             }
           ]
@@ -42,11 +42,25 @@
                       "Entity": "fact_sales"
                     }
                   },
-                  "Property": "Total Revenue"
+                  "Property": "New Customers"
                 }
               },
-              "queryRef": "fact_sales.Total Revenue",
-              "nativeQueryRef": "Total Revenue"
+              "queryRef": "fact_sales.New Customers",
+              "nativeQueryRef": "New Customers"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fact_sales"
+                    }
+                  },
+                  "Property": "Returning Customers"
+                }
+              },
+              "queryRef": "fact_sales.Returning Customers",
+              "nativeQueryRef": "Returning Customers"
             }
           ]
         },
@@ -60,11 +74,11 @@
                       "Entity": "fact_sales"
                     }
                   },
-                  "Property": "Freight Burden % (proxy)"
+                  "Property": "Returning Revenue % (monthly basis)"
                 }
               },
-              "queryRef": "fact_sales.Freight Burden % (proxy)",
-              "nativeQueryRef": "Freight Burden % (proxy)"
+              "queryRef": "fact_sales.Returning Revenue % (monthly basis)",
+              "nativeQueryRef": "Returning Revenue % (monthly basis)"
             }
           ]
         },
@@ -78,11 +92,11 @@
                       "Entity": "fact_sales"
                     }
                   },
-                  "Property": "State Revenue Share %"
+                  "Property": "Returning Customer %"
                 }
               },
-              "queryRef": "fact_sales.State Revenue Share %",
-              "nativeQueryRef": "State Revenue Share %"
+              "queryRef": "fact_sales.Returning Customer %",
+              "nativeQueryRef": "Returning Customer %"
             },
             {
               "field": {
@@ -92,11 +106,11 @@
                       "Entity": "fact_sales"
                     }
                   },
-                  "Property": "Total Orders"
+                  "Property": "New Customer Revenue"
                 }
               },
-              "queryRef": "fact_sales.Total Orders",
-              "nativeQueryRef": "Total Orders"
+              "queryRef": "fact_sales.New Customer Revenue",
+              "nativeQueryRef": "New Customer Revenue"
             },
             {
               "field": {
@@ -106,11 +120,11 @@
                       "Entity": "fact_sales"
                     }
                   },
-                  "Property": "AOV"
+                  "Property": "Returning Customer Revenue"
                 }
               },
-              "queryRef": "fact_sales.AOV",
-              "nativeQueryRef": "AOV"
+              "queryRef": "fact_sales.Returning Customer Revenue",
+              "nativeQueryRef": "Returning Customer Revenue"
             }
           ]
         }
@@ -119,16 +133,16 @@
         "sort": [
           {
             "field": {
-              "Measure": {
+              "Column": {
                 "Expression": {
                   "SourceRef": {
-                    "Entity": "fact_sales"
+                    "Entity": "dim_date"
                   }
                 },
-                "Property": "Total Revenue"
+                "Property": "year_month"
               }
             },
-            "direction": "Descending"
+            "direction": "Ascending"
           }
         ]
       }
@@ -144,26 +158,6 @@
                 }
               }
             }
-          }
-        }
-      ],
-      "dataPoint": [
-        {
-          "properties": {
-            "fill": {
-              "solid": {
-                "color": {
-                  "expr": {
-                    "Literal": {
-                      "Value": "'#E66C37'"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "selector": {
-            "metadata": "fact_sales.Freight Burden % (proxy)"
           }
         }
       ]
@@ -182,7 +176,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Revenue dan freight burden (proxy) per state'"
+                  "Value": "'Customer baru vs returning per bulan'"
                 }
               }
             }
@@ -202,7 +196,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Q3 · Wilayah mana yang besar dari sisi revenue, order, dan AOV? Garis = ongkir dibayar customer ÷ harga barang'"
+                  "Value": "'Q4 · Berapa porsi customer returning dan kontribusi revenue-nya? · Batang = jumlah customer · Garis = % revenue dari customer returning'"
                 }
               }
             }
