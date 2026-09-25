@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "ace41463df481114ab9e",
+  "position": {
+    "x": 24,
+    "y": 1018,
+    "z": 10,
+    "height": 56,
+    "width": 1872,
+    "tabOrder": 10
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Definisi · 1 unit = 1 baris order item · Harga rata-rata per unit = revenue ÷ unit · Freight burden (proxy) = Σ ongkir yang dibayar customer ÷ Σ harga barang — bukan profit, bukan biaya perusahaan/seller · Produk hanya berupa ID anonim (dataset tidak memuat nama produk) · 2018 hanya Jan–Jul; perbandingan porsi kategori antar-tahun yang adil ada di Q2c · NusaMart adalah nama fiktif; data: Olist (Kaggle), R$.",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "color": "#605E5C"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
