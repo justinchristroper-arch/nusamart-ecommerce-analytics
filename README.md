@@ -2,9 +2,23 @@
 
 > End-to-end business analysis project: dari data transaksi mentah menjadi dashboard, insight, dan rekomendasi bisnis untuk manajemen.
 
-**Live dashboard:** [link — diisi setelah publish] · **Case study:** [link — diisi setelah deploy] · **Executive summary:** [PDF — diisi]
+**Dashboard publik (Power BI):** [buka dashboard interaktif](https://app.powerbi.com/view?r=eyJrIjoiNWQ3ZjljMjgtZmRjZS00YjhjLWI2ZjctZGViNmIxNTJiMTJiIiwidCI6IjM0ODViOTYzLTgyYmEtNGE2Zi04MTBmLWI1Y2MyMjZmZjg5OCIsImMiOjEwfQ%3D%3D)
 
-![Dashboard](screenshots/executive_overview.png)
+## Dashboard
+
+Tiga halaman dengan filter yang sama (Tahun, Kategori, State) dan jendela analisis 2017-01 s/d 2018-07.
+
+**Executive Overview:** KPI utama dengan perbandingan periode yang sama tahun lalu, tren revenue & AOV per bulan, dan 10 state teratas beserta freight burden (proxy).
+
+![Executive Overview](screenshots/01_executive_overview.png)
+
+**Customer Analysis:** customer baru vs returning per bulan, repeat rate, dan konsentrasi revenue per desil customer.
+
+![Customer Analysis](screenshots/02_customer_analysis.png)
+
+**Product & Category:** 15 kategori teratas (drill-down ke produk), volume vs harga rata-rata per kategori, dan kategori besar dengan freight burden (proxy) di atas rata-rata.
+
+![Product & Category](screenshots/03_product_category.png)
 
 ## Business problem
 
@@ -23,8 +37,10 @@ Raw CSV (Olist) → Python/Pandas → PostgreSQL (star schema) → SQL analysis 
 | Data understanding & cleaning | Python, Pandas | [`notebooks/01_data_cleaning.ipynb`](notebooks/01_data_cleaning.ipynb) |
 | Data model | PostgreSQL | [`sql/01_create_schema.sql`](sql/01_create_schema.sql) |
 | Analisis | SQL | [`sql/`](sql/) — satu query per business question |
-| Dashboard | Power BI | 3 halaman: Executive, Customer, Product & Category |
+| Dashboard | Power BI | [`powerbi/`](powerbi/) — Power BI Project (.pbip), 3 halaman: Executive, Customer, Product & Category |
 | Rekomendasi | — | [`docs/insights_and_recommendations.md`](docs/insights_and_recommendations.md) |
+
+**Validasi angka:** KPI utama identik di notebook, SQL ([`sql/05_kpi_reference.sql`](sql/05_kpi_reference.sql)), dan dashboard — misalnya revenue R$ 12.342.450,49 dari 89.860 order dan 86.960 customer.
 
 ## Key insights
 
@@ -51,20 +67,25 @@ Jendela analisis 2017-01 s/d 2018-07. Bukti lengkap, hipotesis, dan rekomendasi:
 4. Buat database `nusamart` di PostgreSQL, jalankan `sql/01_create_schema.sql`.
 5. Set `NUSAMART_DB_URL`, lalu `python src/load_to_postgres.py`.
 6. Jalankan query di `sql/02`–`05`.
-7. Buka Power BI Desktop → Get Data → PostgreSQL; measure ada di [`powerbi/dax_measures.md`](powerbi/dax_measures.md).
+7. Buka `powerbi/NusaMart.pbip` di Power BI Desktop (PostgreSQL harus berjalan di `localhost:5433`), lalu **Refresh**. Definisi measure ada di [`powerbi/dax_measures.md`](powerbi/dax_measures.md) dan panduan dashboard di [`powerbi/dashboard_build_guide.md`](powerbi/dashboard_build_guide.md). Versi yang dipublikasikan adalah `powerbi/NusaMart - PORTFOLIO.pbip`.
 
 ## Struktur repository
 
 ```
 ├── data/            # raw & processed (tidak di-upload)
 ├── notebooks/       # data understanding & cleaning
-├── src/             # script load ke PostgreSQL
-├── sql/             # schema + analisis
-├── powerbi/         # file .pbix + DAX measures
-├── screenshots/
+├── src/             # script load ke PostgreSQL + cek right-censoring
+├── sql/             # schema + analisis (satu query per business question)
+├── results/         # ringkasan hasil query (CSV) yang dirujuk insight
+├── powerbi/         # Power BI Project (.pbip): model TMDL, report PBIR, DAX measures, panduan
+├── screenshots/     # tangkapan layar dashboard
 └── docs/            # BRD, data dictionary, insights
 ```
 
 ## Data & atribusi
 
-Data: *Brazilian E-Commerce Public Dataset by Olist*, Kaggle. [Cantumkan lisensi sesuai halaman dataset.] NusaMart adalah nama fiktif untuk keperluan studi kasus; wilayah asli (state Brasil) dipertahankan.
+Data: [*Brazilian E-Commerce Public Dataset by Olist*](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) (Olist, Kaggle), lisensi [CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/). Turunan data di repo ini (ringkasan di `results/` dan dashboard) dibagikan dengan lisensi yang sama untuk keperluan non-komersial. NusaMart adalah nama fiktif untuk keperluan studi kasus; wilayah asli (state Brasil) dipertahankan.
+
+## Catatan pengerjaan
+
+Project ini dikerjakan dengan bantuan AI coding assistant, dengan semua keputusan analisis dan validasi angka saya review sendiri.
