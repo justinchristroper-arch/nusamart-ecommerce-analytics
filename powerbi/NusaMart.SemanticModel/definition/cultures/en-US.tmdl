@@ -25,6 +25,111 @@ cultureInfo en-US
 			          }
 			        }
 			      ]
+			    },
+			    "fact_sales.total_revenue": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "fact_sales",
+			          "ConceptualProperty": "Total Revenue"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Revenue": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "fact_sales.category_revenue_share_": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "fact_sales",
+			          "ConceptualProperty": "Category Revenue Share %"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Porsi revenue": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "fact_sales.freight_burden__proxy": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "fact_sales",
+			          "ConceptualProperty": "Freight Burden % (proxy)"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Freight burden (proxy)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "fact_sales.avg_item_price": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "fact_sales",
+			          "ConceptualProperty": "Avg Item Price"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Harga rata-rata/unit": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "fact_sales.freight_per_unit": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "fact_sales",
+			          "ConceptualProperty": "Freight per Unit"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "Ongkir/unit": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
 			    }
 			  }
 			}

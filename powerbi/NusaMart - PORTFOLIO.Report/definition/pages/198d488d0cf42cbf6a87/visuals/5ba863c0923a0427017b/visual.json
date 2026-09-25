@@ -1,0 +1,37 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "5ba863c0923a0427017b",
+  "position": {
+    "x": 24,
+    "y": 1018,
+    "z": 9,
+    "height": 56,
+    "width": 1872,
+    "tabOrder": 9
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Definisi · Customer = customer_unique_id · Baru = order pertamanya (dihitung dari seluruh histori, termasuk 2016) jatuh di bulan/periode tersebut · Returning = sudah pernah order sebelumnya · Repeat rate = customer dengan ≥ 2 order di periode terpilih ÷ total customer · Revenue returning dihitung per bulan lalu dijumlahkan · Desil customer dihitung di SQL (Q5a) untuk seluruh periode · NusaMart adalah nama fiktif; data: Olist (Kaggle), R$.",
+                    "textStyle": {
+                      "fontSize": "9pt",
+                      "color": "#605E5C"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

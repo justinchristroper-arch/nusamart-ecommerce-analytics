@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "NusaMart - PORTFOLIO"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "fd0ae4d0-ad99-47ad-a917-e0399a72718d"
+  }
+}
