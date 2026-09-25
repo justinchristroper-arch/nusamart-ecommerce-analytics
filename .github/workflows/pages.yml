@@ -1,0 +1,40 @@
+# Menerbitkan folder site/ (halaman case study) ke GitHub Pages.
+# Tidak ada proses build: isi site/ diunggah apa adanya, dan folder lain (termasuk docs/) tidak ikut.
+# Syarat: Settings -> Pages -> Source = "GitHub Actions".
+name: Deploy case study
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Ambil isi repo
+        uses: actions/checkout@v7
+      - name: Siapkan GitHub Pages
+        uses: actions/configure-pages@v6
+      - name: Unggah folder site/
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: site
+      - name: Terbitkan
+        id: deployment
+        uses: actions/deploy-pages@v5

@@ -2,6 +2,8 @@
 
 > End-to-end business analysis project: dari data transaksi mentah menjadi dashboard, insight, dan rekomendasi bisnis untuk manajemen.
 
+**Case study (halaman web):** [justinchristroper-arch.github.io/nusamart-ecommerce-analytics](https://justinchristroper-arch.github.io/nusamart-ecommerce-analytics/)
+
 **Dashboard publik (Power BI):** [buka dashboard interaktif](https://app.powerbi.com/view?r=eyJrIjoiNWQ3ZjljMjgtZmRjZS00YjhjLWI2ZjctZGViNmIxNTJiMTJiIiwidCI6IjM0ODViOTYzLTgyYmEtNGE2Zi04MTBmLWI1Y2MyMjZmZjg5OCIsImMiOjEwfQ%3D%3D)
 
 **Executive summary untuk manajemen (7 slide):** [PDF](docs/executive_summary.pdf) · [PPTX](docs/executive_summary.pptx)
@@ -83,6 +85,7 @@ Jendela analisis 2017-01 s/d 2018-07. Bukti lengkap, hipotesis, dan rekomendasi:
 ├── results/         # ringkasan hasil query (CSV) yang dirujuk insight
 ├── powerbi/         # Power BI Project (.pbip): model TMDL, report PBIR, DAX measures, panduan
 ├── screenshots/     # tangkapan layar dashboard
+├── site/            # halaman case study (GitHub Pages, diterbitkan oleh .github/workflows/pages.yml)
 └── docs/            # BRD, data dictionary, insights, executive summary (PDF + PPTX)
 ```
 
