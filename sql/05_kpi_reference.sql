@@ -1,9 +1,9 @@
 -- =====================================================================
 -- 05_kpi_reference.sql
 -- SATU-SATUNYA kunci jawaban rekonsiliasi. Hasil di sini HARUS SAMA
--- dengan angka referensi notebook (PROGRESS.md bagian 1) dan dengan
--- KPI card di Power BI (filter jendela analisis yang sama).
--- Jika beda, cari penyebabnya sebelum lanjut (lihat CLAUDE.md aturan 8).
+-- dengan angka referensi notebook (notebooks/01_data_cleaning.ipynb,
+-- bagian 11) dan dengan KPI card di Power BI (filter jendela analisis
+-- yang sama). Jika beda, cari penyebabnya sebelum lanjut.
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
@@ -16,8 +16,8 @@ UNION ALL SELECT 'dim_date',     COUNT(*) FROM dim_date;
 
 -- ---------------------------------------------------------------------
 -- KPI TOTAL -- jendela analisis (2017-01 s/d 2018-07)
--- Ini angka acuan utama. Harus identik dengan tabel referensi di
--- PROGRESS.md bagian 1 dan dengan KPI card Power BI.
+-- Ini angka acuan utama. Harus identik dengan KPI referensi di
+-- notebook bagian 11 dan dengan KPI card Power BI.
 -- ---------------------------------------------------------------------
 WITH per_customer AS (
     SELECT f.customer_unique_id, COUNT(DISTINCT f.order_id) AS n_orders
