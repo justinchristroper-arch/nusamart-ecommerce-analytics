@@ -4,6 +4,8 @@
 
 **Dashboard publik (Power BI):** [buka dashboard interaktif](https://app.powerbi.com/view?r=eyJrIjoiNWQ3ZjljMjgtZmRjZS00YjhjLWI2ZjctZGViNmIxNTJiMTJiIiwidCI6IjM0ODViOTYzLTgyYmEtNGE2Zi04MTBmLWI1Y2MyMjZmZjg5OCIsImMiOjEwfQ%3D%3D)
 
+**Executive summary untuk manajemen (7 slide):** [PDF](docs/executive_summary.pdf) · [PPTX](docs/executive_summary.pptx)
+
 ## Dashboard
 
 Tiga halaman dengan filter yang sama (Tahun, Kategori, State) dan jendela analisis 2017-01 s/d 2018-07.
@@ -39,6 +41,7 @@ Raw CSV (Olist) → Python/Pandas → PostgreSQL (star schema) → SQL analysis 
 | Analisis | SQL | [`sql/`](sql/) — satu query per business question |
 | Dashboard | Power BI | [`powerbi/`](powerbi/) — Power BI Project (.pbip), 3 halaman: Executive, Customer, Product & Category |
 | Rekomendasi | — | [`docs/insights_and_recommendations.md`](docs/insights_and_recommendations.md) |
+| Executive summary | Python (python-pptx), PowerPoint | [`docs/executive_summary.pdf`](docs/executive_summary.pdf) — 7 slide; angka dibaca langsung dari `results/` oleh [`src/build_executive_summary.py`](src/build_executive_summary.py) |
 
 **Validasi angka:** KPI utama identik di notebook, SQL ([`sql/05_kpi_reference.sql`](sql/05_kpi_reference.sql)), dan dashboard — misalnya revenue R$ 12.342.450,49 dari 89.860 order dan 86.960 customer.
 
@@ -68,18 +71,19 @@ Jendela analisis 2017-01 s/d 2018-07. Bukti lengkap, hipotesis, dan rekomendasi:
 5. Set `NUSAMART_DB_URL`, lalu `python src/load_to_postgres.py`.
 6. Jalankan query di `sql/02`–`05`.
 7. Buka `powerbi/NusaMart.pbip` di Power BI Desktop (PostgreSQL harus berjalan di `localhost:5433`), lalu **Refresh**. Definisi measure ada di [`powerbi/dax_measures.md`](powerbi/dax_measures.md) dan panduan dashboard di [`powerbi/dashboard_build_guide.md`](powerbi/dashboard_build_guide.md). Versi yang dipublikasikan adalah `powerbi/NusaMart - PORTFOLIO.pbip`.
+8. `python src/build_executive_summary.py` membuat `docs/executive_summary.pptx` dari `results/`. Versi PDF diekspor dari PowerPoint (File → Export → PDF).
 
 ## Struktur repository
 
 ```
 ├── data/            # raw & processed (tidak di-upload)
 ├── notebooks/       # data understanding & cleaning
-├── src/             # script load ke PostgreSQL + cek right-censoring
+├── src/             # script load ke PostgreSQL, cek right-censoring, pembuat executive summary
 ├── sql/             # schema + analisis (satu query per business question)
 ├── results/         # ringkasan hasil query (CSV) yang dirujuk insight
 ├── powerbi/         # Power BI Project (.pbip): model TMDL, report PBIR, DAX measures, panduan
 ├── screenshots/     # tangkapan layar dashboard
-└── docs/            # BRD, data dictionary, insights
+└── docs/            # BRD, data dictionary, insights, executive summary (PDF + PPTX)
 ```
 
 ## Data & atribusi

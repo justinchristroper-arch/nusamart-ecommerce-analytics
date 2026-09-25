@@ -2,3 +2,5 @@ pandas>=2.2,<3.0
 notebook
 sqlalchemy>=2.0
 psycopg2-binary
+# hanya untuk src/build_executive_summary.py (docs/executive_summary.pptx)
+python-pptx>=1.0
